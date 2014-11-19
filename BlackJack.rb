@@ -10,27 +10,34 @@
 
 require 'pry'
 
-def get_cards(deck, card)
-  2.times do
-    card << deck.pop()
+def get_new_card(deck, deck2)
+  rand_num = rand(1..2)
+  if rand_num == 1
+    return deck.pop
+  else
+    return deck2.pop
   end
-  card
+end
+
+def preparedeck
+  suits = ['Heart', 'Diamond', 'Spade', 'Club']
+  cards = ['2','3','4','5','6','7','8','9','10','Jack','Queen','King','Ace']
+  deck = suits.product(cards)
+  deck.shuffle!
 end
 
 def calculate_total(cards)
   sum = 0
   cards.each do |card|
-    sum += value_convert(card[1])
+    sum += card2value(card[1])
   end
-
   cards.select{|e| e[0] == "Ace"}.count.times do
     sum -= 10 if sum > 21
   end
   sum
-  #binding.pry
 end
 
-def value_convert(card)
+def card2value(card)
   card_values = {'2'=>2, '3'=>3, '4'=>4, '5'=>5, '6'=>6, '7'=>7, '8'=>8, '9'=>9, '10'=>10, 'Jack'=>10, 'Queen'=>10, 'King'=>10, 'Ace'=>11}
   return card_values.fetch(card)
 end
@@ -50,93 +57,98 @@ def check_win(dealer, player, name)
 end
 
 
+begin
 #-----------------Preprocessing-------------------------
-suits = ['Heart', 'Diamond', 'Spade', 'Club']
-cards = ['2','3','4','5','6','7','8','9','10','Jack','Queen','King','Ace']
-deck = suits.product(cards)
-deck.shuffle!
-player_cards = []
-dealer_cards = []
-
+    deck = preparedeck
+    deck2 = preparedeck
+    player_cards = []
+    dealer_cards = []
+    playing = true
 #------------Main Program Starts Here-------------------
 
-  puts "Welcome to Blackjack!"
-  puts "Please enter your name:"
+    puts "Welcome to Blackjack!"
+    puts "Please enter your name:"
 
-  user_name = gets.chomp
+    user_name = gets.chomp
 
-  player_cards = get_cards(deck, player_cards)
-  dealder_card = get_cards(deck, dealer_cards)
-  player_sum = calculate_total(player_cards)
-  dealer_sum = calculate_total(dealer_cards)
-
-
-  p "#{user_name}, your cards are: #{player_cards}"
-  p "Dealer cards are: #{dealer_cards}"
-
-  if player_sum == 21
-    p "Congradulations #{user_name}! You hit BlackJack!"
-    exit
-  end
-
-
-#the player's turn
-  while player_sum < 21
-
-    p "#{user_name}, do you want to 1)Hit or 2)Stay?"
-    user_input = gets.chomp
-
-    if ![1,2].include?(user_input.to_i)
-      begin
-        puts "Please enter one of the following choices: 1)Hit or 2)Stay"
-        user_input = gets.chomp
-      end while ![1,2].include?(user_input.to_i)
+    2.times do
+      player_cards << get_new_card(deck, deck2)
+      dealer_cards << get_new_card(deck, deck2)
     end
-
-    if user_input.to_i == 2
-      puts "#{user_name}, you have chosen to stay!"
-      break
-    end
-
-    player_cards << deck.pop()
-    p "#{user_name}, you have: #{player_cards}"
 
     player_sum = calculate_total(player_cards)
-    puts "Your total is: #{player_sum}"
-
-    if player_sum > 21
-      puts "KABOOM! #{user_name}, you went bust!"
-      exit
-    elsif player_sum == 21
-      puts "BLACKJACK!!! Congrats #{user_name}, you win!"
-      exit
-      #break
-    end
-
-  end #end of player's turn
-
-#the dealer's turn
-
-  if dealer_sum == 21
-    p "Sorry, looks like dealer hit BlackJack..."
-    exit
-  end
-
-  while dealer_sum < 17
-    dealer_cards << deck.pop()
-    p "The dealder's cards are: #{dealer_cards}"
-
     dealer_sum = calculate_total(dealer_cards)
 
-    if dealer_sum > 21
-      puts "Congrats, dealer just went bust, you win!"
-      exit
-    elsif dealer_sum == 21
-      puts "Sorry, looks like dealder hit BlackJack..."
+    p "#{user_name}, your cards are: #{player_cards}"
+    p "Dealer cards are: #{dealer_cards}"
+
+    if player_sum == 21
+      p "Congradulations #{user_name}! You hit BlackJack!"
       exit
     end
-  end #end of dealer's turn
 
-  check_win(dealer_cards, player_cards, user_name)
+    while player_sum < 21 #the player's turn
 
-  exit
+      begin
+        puts "#{user_name}, please enter one of the following choices: 1)Hit or 2)Stay"
+        user_input = gets.chomp
+      end while ![1,2].include?(user_input.to_i)
+
+      if user_input.to_i == 2
+        puts "#{user_name}, you have chosen to stay!"
+        break
+      end
+
+      player_cards << get_new_card(deck, deck2)
+
+      p "#{user_name}, you have: #{player_cards}"
+
+      player_sum = calculate_total(player_cards)
+      puts "Your total is: #{player_sum}"
+
+      if player_sum > 21
+        puts "KABOOM! #{user_name}, you went bust!"
+        #exit
+      elsif player_sum == 21
+        puts "BLACKJACK!!! Congrats #{user_name}, you win!"
+        #exit
+        #break
+      end
+
+    end #end of player's turn
+
+    if dealer_sum == 21 #the dealer's turn
+      p "Sorry, looks like dealer hit BlackJack..."
+      exit
+    end
+
+    while dealer_sum < 17
+      dealer_cards << get_new_card(deck, deck2)
+      p "The dealder's cards are: #{dealer_cards}"
+      dealer_sum = calculate_total(dealer_cards)
+
+      if dealer_sum > 21
+        puts "Congrats, dealer just went bust, you win!"
+        #exit
+      elsif dealer_sum == 21
+        puts "Sorry, looks like dealder hit BlackJack..."
+        #exit
+      end
+    end #end of dealer's turn
+
+    check_win(dealer_cards, player_cards, user_name)
+
+    begin
+      puts "Do you want to play again? (Y/N)"
+      user_input = gets.chomp.downcase
+      if user_input == 'y'
+        break
+      elsif user_input == 'n'
+        playing == false
+        exit
+      end
+      #break if palying == false
+    end while !['y','n'].include?(user_input)
+
+end while playing != false
+exit
