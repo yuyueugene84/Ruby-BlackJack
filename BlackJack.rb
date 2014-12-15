@@ -1,7 +1,6 @@
 #create deck
 #shuffle deck, pop two cards to player, another two to dealer
 #display cards, ask if ask if player wants to continue
-
 #if player don't want to contunue, caculate total, decide winner, break
 #if player continue, add one more card to player array, if sum > 21, kaboom, print you lose
 #if player hit 21, print "blackjack, you win!"
@@ -88,7 +87,6 @@ begin
     end
 
     while player_sum < 21 #the player's turn
-
       begin
         puts "#{user_name}, please enter one of the following choices: 1)Hit or 2)Stay"
         user_input = gets.chomp
@@ -108,11 +106,8 @@ begin
 
       if player_sum > 21
         puts "KABOOM! #{user_name}, you went bust!"
-        #exit
       elsif player_sum == 21
         puts "BLACKJACK!!! Congrats #{user_name}, you win!"
-        #exit
-        #break
       end
 
     end #end of player's turn
@@ -129,10 +124,8 @@ begin
 
       if dealer_sum > 21
         puts "Congrats, dealer just went bust, you win!"
-        #exit
       elsif dealer_sum == 21
         puts "Sorry, looks like dealder hit BlackJack..."
-        #exit
       end
     end #end of dealer's turn
 
